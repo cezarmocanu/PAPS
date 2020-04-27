@@ -1,11 +1,11 @@
 const sequelize = require('./sequelizeConfig');
 const {DataTypes} = require('sequelize');
 
-const product = sequelize.define('product',{
+const Product = sequelize.define('admin',{
     
 });
 
 //(async ()=>{await sequelize.sync({ force: true });})()
 
 
-module.exports = product;
+module.exports = Product;

@@ -6,7 +6,7 @@ import {Link} from 'react-router-dom';
 const Home = (props)=>{
 
     return (<div>
-              <Link onClick={()=>props.dispatch(addPage('Categorii','/categories'))} to="/categories">Mergi la categorii</Link>
+              
             </div>)
 };
 

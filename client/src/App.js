@@ -9,16 +9,16 @@ import Main from './components/Main';
 import thunk from 'redux-thunk';
 import './App.scss';
 import './Actions';
-import { ADD_PAGE,
-         CLEAR_PAGE,
+import { //ADD_PAGE,
+         //CLEAR_PAGE,
          TOGGLE_LATERAL_PANEL,
-         FETCH_CATEGORIES_BEGIN,
+         //FETCH_CATEGORIES_BEGIN,
          FETCH_CATEGORIES_SUCCESS,
          FETCH_CATEGORIES_FAILURE,
          POST_LOGIN_BEGIN,
          POST_LOGIN_SUCCESS,
          POST_LOGIN_FAILURE, 
-         CHECK_ADMINS_BEGIN,
+         //CHECK_ADMINS_BEGIN,
          CHECK_ADMINS_SUCCESS,
          CHECK_ADMINS_FAILURE,
          POST_SIGNUP_BEGIN,
@@ -31,22 +31,27 @@ import { ADD_PAGE,
          CHANGE_ADMIN_SUBMENU,
          CHANGE_ADMIN_MENU,
          POST_UPLOAD_QUEUE_SUCCESS,
-         FETCH_ALL_IMAGES_BEGIN,
+         //FETCH_ALL_IMAGES_BEGIN,
          FETCH_ALL_IMAGES_SUCCESS,
-         FETCH_ALL_IMAGES_FAILURE,
+         //FETCH_ALL_IMAGES_FAILURE,
          FETCH_IMAGE_SUCCESS,
          SELECT_CATEGORY_IMAGE_BEGIN,
          SELECT_CATEGORY_IMAGE_END,
          SELECT_CATEGORY_IMAGE_CHOOSE,
          POST_CATEGORY_SUCCESS,
          FETCH_SUBCATEGORIES_SUCCESS,
-         FETCH_CLIENT_IMAGE_SUCCESS
+         FETCH_CLIENT_IMAGE_SUCCESS,
+         CHANGE_PAGE,
+         INIT_BREADCRUMB_SUCCESS,
+         CLEAR_BREADCRUMB
         } from './Actions';
+import Footer from './components/Footer';
 
 
 const initialState = {
   lateralPanelToggled:false,
-  breadcrumbs:[{name:'Acasa',path:'/'}],
+  breadcrumbPath:[{name:'Acasa',url:'/'}],
+  breadcrumbsInitialized:false,
   categories:[],
   subcategories:[],
   role:undefined,
@@ -60,7 +65,8 @@ const initialState = {
   notifications:[],
   selectCategoryImage:false,
   newCategoryImage:undefined,
-  imagesHashMap:{}
+  imagesHashMap:{},
+  pageReload:[]
   
 }
 
@@ -68,19 +74,6 @@ function reducer(state=initialState,action){
 
   //action payload e continutul unui action
   switch(action.type){
-    case ADD_PAGE:
-      ///de facut fara push si de testat
-      state.breadcrumbs.push(action.payload);
-      return{
-        ...state,
-        breadcrumbs:[...state.breadcrumbs]
-      }
-    case CLEAR_PAGE:
-      const index = state.breadcrumbs.findIndex(crumb => crumb.name === action.payload)
-      return{
-        ...state,
-        breadcrumbs:[...state.breadcrumbs.slice(0,index+1)]
-      }
     case TOGGLE_LATERAL_PANEL:
       return{
         ...state,
@@ -216,10 +209,11 @@ function reducer(state=initialState,action){
       }
     
     case FETCH_SUBCATEGORIES_SUCCESS:
-      console.log(action.payload);
+      //console.log(action.payload);
       return {
         ...state,
-        subcategories:[...action.payload]
+        subcategories:[...action.payload],
+        notifications:["subcategories",...state.notifications]
       }
     case FETCH_CLIENT_IMAGE_SUCCESS:
       
@@ -228,6 +222,22 @@ function reducer(state=initialState,action){
       return {
         ...state,
         imagesHashMap:{...state.imagesHashMap}
+      }
+    case CHANGE_PAGE:
+      return {
+        ...state,
+        pageReload:[...state.pageReload]
+      }
+    case INIT_BREADCRUMB_SUCCESS:
+      return{
+        ...state,
+        breadcrumbPath:[{name:'Acasa',url:'/'},...action.payload],
+      }
+    case CLEAR_BREADCRUMB:
+      const lastCrumbIndex = state.breadcrumbPath.findIndex(crumb => action.payload.url === crumb.url);
+      return{
+        ...state,
+        breadcrumbPath:[...state.breadcrumbPath.splice(0,lastCrumbIndex+1)]
       }
     default:
       return state;
@@ -250,6 +260,7 @@ const App = () => {
             <Main/>
           </div>
           <AdminUI/>
+          <Footer/>
         </Router>
       </Provider>
     </div>

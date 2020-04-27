@@ -1,8 +1,9 @@
+import { FaCreativeCommonsZero } from "react-icons/fa";
+
 let last = 0;
 const GEN_ID = ()=>{return last++;}
 
-export const ADD_PAGE = GEN_ID();
-export const CLEAR_PAGE = GEN_ID();
+
 export const TOGGLE_LATERAL_PANEL = GEN_ID();
 
 export const FETCH_CATEGORIES_BEGIN   = GEN_ID();
@@ -55,14 +56,21 @@ export const FETCH_SUBCATEGORIES_BEGIN = GEN_ID();
 export const FETCH_SUBCATEGORIES_SUCCESS = GEN_ID();
 export const FETCH_SUBCATEGORIES_FAILURE = GEN_ID();
 
-
 export const FETCH_CLIENT_IMAGE_BEGIN = GEN_ID();
 export const FETCH_CLIENT_IMAGE_SUCCESS = GEN_ID();
 export const FETCH_CLIENT_IMAGE_FAILURE = GEN_ID();
 
+export const CHANGE_PAGE = GEN_ID();
+
+export const INIT_BREADCRUMB_BEGIN = GEN_ID();
+export const INIT_BREADCRUMB_SUCCESS = GEN_ID();
+export const INIT_BREADCRUMB_FAILURE = GEN_ID();
+
+export const CLEAR_BREADCRUMB = GEN_ID();
+
+
+
 //action creators
-export const addPage = (name,path) =>({type:ADD_PAGE,payload:{name:name,path:path}})
-export const clearPage = (name) =>({type:CLEAR_PAGE,payload:name})
 
 export const toggleLateralPanel = (value) => ({type:TOGGLE_LATERAL_PANEL,payload:value})
 
@@ -120,8 +128,15 @@ export const fetchClientImageBegin = () => ({type:FETCH_CLIENT_IMAGE_BEGIN});
 export const fetchClientImageSuccess = (id,data) => ({type:FETCH_CLIENT_IMAGE_SUCCESS,payload:{id:id,data:data}});
 export const fetchClientImageFailure = () => ({type:FETCH_CLIENT_IMAGE_FAILURE});
 
+export const changePage = () => ({type:CHANGE_PAGE})
 
-const host = "http://192.168.1.111:5000";
+export const initBreadcrumbBegin = () => ({type:INIT_BREADCRUMB_BEGIN});
+export const initBreadcrumbSuccess = (path) => ({type:INIT_BREADCRUMB_SUCCESS,payload:path});
+export const initBreadcrumbFailure = () => ({type:INIT_BREADCRUMB_FAILURE});
+
+export const clearBreadcrumb = (lastCrumb) => ({type:CLEAR_BREADCRUMB,payload:lastCrumb});
+
+const host = "http://localhost:5000";
 
 export const B64toJSON = (s) => {
   try {
@@ -143,6 +158,7 @@ export const fetchCategories = ()=>{
           .catch(error => dispatch(fetchCategoriesFailure(error)))
   }
 }
+
 
 export const reloadToken = (data) => {
   return dispatch => {
@@ -305,6 +321,7 @@ export const fetchSubcategories = (idCategory) =>{
     .then(res => res.json())
     .then((json) => {
       dispatch(fetchSubcategoriesSuccess(json))
+      
     })
     .catch(error => dispatch(fetchSubcategoriesFailure()))
   }
@@ -323,5 +340,17 @@ export const fetchClientImage = (id) =>{
       })
     })
     .catch(error => dispatch(fetchClientImageFailure()))
+  }
+}
+
+export const initBreadcrumb = (id,symbol) => {
+  return dispatch => {
+    dispatch(initBreadcrumbBegin());
+    return fetch(`${host}/api/breadcrumb/${id}/${symbol}`)
+    .then(res => res.json())
+    .then(json => {
+      dispatch(initBreadcrumbSuccess(json.path))
+    })
+    .catch(error =>dispatch(initBreadcrumbFailure()))
   }
 }

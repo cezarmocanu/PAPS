@@ -5,6 +5,7 @@ const port = process.env.PORT | 5000;
 const Category = require('./models/Category');
 const Admin = require('./models/Admin');
 const Image = require('./models/Image');
+const sequelize = require('./models/sequelizeConfig');
 const cors = require('cors')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -87,6 +88,36 @@ app.post('/admin/uploadimages', uploads.array('photos', 25),async (req, res, nex
     }
 })
 
+app.get('/api/breadcrumb/:id/:symbol',async (req,res) => {
+    const id = req.params.id;
+    const symbol = req.params.symbol;
+    console.log(id,symbol)
+
+    if(symbol === 'c'){
+        Promise.all([await Category.findAll({attributes:['id','name'],where:{id:id}})])
+        .then(qresult =>{
+            const result = qresult[0][0];
+            const urlName = result.name.trim().replace(' ','-').toLowerCase();
+            return res.json({path:[{name:result.name,url:`/${urlName}/${result.id}/c`}]});
+        })
+    }
+
+    if(symbol === 'sc'){
+        Promise.all([await sequelize.query(`SELECT categories.id AS xid,categories.name AS xname,
+                                                    sc.id AS yid,sc.name AS yname 
+                                                    FROM (SELECT * FROM categories WHERE ID = ${id}) 
+                                                    AS sc,categories WHERE sc.parent = categories.id;`)])
+        .then(qresult => {
+            const result = qresult[0][0][0];
+            const xUrlName = result.xname.trim().replace(' ','-').toLowerCase();
+            const yUrlName = result.yname.trim().replace(' ','-').toLowerCase();
+            return res.json({path:[{name:result.xname,url:`/${xUrlName}/${result.xid}/c`},
+                                   {name:result.yname,url:`/${yUrlName}/${result.yid}/sc`}]});
+        })
+    }
+
+
+})
 
 app.get('/admin/images', async (req, res, next) => {
     //de facut verificare pt missing

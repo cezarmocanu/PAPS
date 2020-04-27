@@ -9,23 +9,237 @@
   h1,h2,h3,h4,h5,h6,span,button,select,input,p{
     font-family: Arial, Helvetica, sans-serif;
   }
+
+  .footer{
+    width: 100%;
+    height:200px;
+    background-color: $primary;
+    //border-top:5px solid $info;
+  }
+
+  .breadcrumb{
+    display: flex;
+    font-size:1em;
+    color:$primary;
+    padding-top:6px;
+    padding-bottom:1px;
+    margin-left:10px;
+    margin-bottom:25px;
+    
+    svg{
+      color:darken($info,0);
+      
+    }
+
+   
+
+    .crumb-text{
+      position: relative;
+      display: flex;
+      flex-flow: column;
+      margin-bottom: 0px;
+      padding-bottom: 5px;
+      height: max-content;
+      transition: 0.5s;
+      hr{
+        border:none;
+        position: absolute;
+        margin-block-start: 0px;
+        margin-block-end: 0px;
+        text-align: center;
+        padding: 0px;
+        width: 100%;
+        bottom: 0px;
+        width: 0px;
+        left:50%;
+        transition: 0.5s;
+      }
+    }
+
+    
+    .crumb{
+      display: flex;
+    
+      &:hover{
+        cursor:pointer;
+        .crumb-text{
+          color:$info;
+          transition: 0.5s;
+          hr{
+            width: 100%;
+            transition: 0.5s;
+            border-top:1px solid $info;
+            left:0;
+          }
+        }
+       
+        
+      }
+
+      .arrow{
+        display: flex;
+        margin-left: 10px;
+        margin-right:10px;
+        svg{
+          
+          margin: auto;
+          margin-top:1px;
+        }
+      }
+
+      &:last-child{
+        .crumb-text{
+          color:darken($info,10);
+          hr{
+            width: 100%;
+            transition: 0.5s;
+            border-top:1px solid $info;
+            left:0;
+          }
+          
+        }
+        .arrow{
+          display:none;
+        }
+      }
+    }
+    .pause{
+      display: flex;  
+      margin-right: 5px;
+      margin-left: 5px;
+      
+      svg{
+    
+        margin: auto;
+        color:$primary;
+        font-size: 1em;
+        margin-top: 1px;
+        margin-bottom: 0px;
+      }
+    }
+    .back{
+      display: flex;  
+
+      &:hover{
+        cursor:pointer;
+        hr{
+          width: 100%;
+          transition: 0.5s;
+          border-top:1px solid $info;
+          left:0;
+        }
+        
+      }
+
+      .arrow{
+        display: flex;
+        margin-right:10px;
+        svg{
+          margin: auto;
+          margin-top:1px;
+        }
+      }
+    }
+  }
+
   .header{
     height: $header-height;
     background-color: $primary;
+    display: flex;
+    .logo{
+      color:white;
+      width:20%;
+      height:100%;
+      display: flex;
+      .content{
+        margin:auto;
+        .capital{
+          font-size: 2em;
+        }
+        span{
+          font-size: 1.4em;
+        }
+      }
+      
+    }
+
+    .search-bar{
+      width:calc(40% - 15px);
+      height:100%;
+      display:flex;
+      margin-left:10px;
+      input{
+        width:90%;
+        margin: auto;
+        display: block;
+        font-size:1em;
+        padding:3px;
+        font-weight: initial;
+        margin-left:0px;
+        color:$primary;
+        transition: 0.2s;
+
+        &:focus,:active{
+          outline:none;
+          width:calc(90% - 2px);
+          border:2px solid $info;
+          transition: 0.2s;
+        }
+      }
+
+      .search-button{
+        content:'';
+        width: 10%;
+        height: 1em;
+        background: $info;
+        margin-top: auto;
+        margin-bottom: auto;
+        display:flex;
+        transition: 0.5s;
+        padding-top:6px;
+        padding-bottom:6px;
+
+        &:hover{
+          background: darken($info,10);
+          cursor:pointer;
+          transition: 0.5s;
+        }
+
+        .icon{
+          color:$primary;
+          margin:auto;
+          font-size:1.2em;
+          
+        }
+      }
+
+      ::placeholder{
+        color:$light-gray;
+        opacity: 1;
+        font-weight: initial;
+        transition: 0.5s;
+      }
+    }
   }
 
+  .main-container{
+    width:80%;
+    -webkit-box-shadow: inset 0px 0px 34px 0px rgba(208,208,208,1);
+    -moz-box-shadow: inset 0px 0px 34px 0px rgba(208,208,208,1);
+    box-shadow: inset 0px 0px 34px 0px rgba(208,208,208,1);
+  }
 
   .category-item{
-    // width: 50%;
-    // height: 50%;
     display: block;
     margin: auto;
     -webkit-box-shadow: 0px 2px 19px 0px rgba(0,0,0,0.3);
     -moz-box-shadow: 0px 2px 19px 0px rgba(0,0,0,0.3);
     box-shadow: 0px 2px 19px 0px rgba(0,0,0,0.3);
+
+    
     .image{
       width: calc(100%);
-      height: calc(80% - 1px);
+      height: calc(80%);
       //display: block;
       border-bottom:1px solid $light-gray;
       
@@ -35,7 +249,6 @@
         max-height: calc(100% - 20px);
         margin: auto;
         padding: 10px;
-        //padding: 10px;
       }
     }
 
@@ -54,11 +267,81 @@
   }
   
   .category-list{
-    width:100%;
-    height:100%;
+    width:calc(100% - 10px);
+    padding:5px;
+    display:flex;
+    flex-flow: row wrap;
     .item{
-      width:25%;
+      width: calc(25% - 10px);
+      height: calc(250px - 10px);
+      margin:5px;
+      -webkit-box-shadow: 0px 2px 12px 0px rgba(0,0,0,0.3);
+      -moz-box-shadow: 0px 2px 12px 0px rgba(0,0,0,0.3);
+      box-shadow: 0px 2px 12px 0px rgba(0,0,0,0.3);
+      transition: 0.5s;
 
+      &:hover{
+        -webkit-box-shadow: 0px 2px 12px 0px rgba(0,0,0,0.7);
+        -moz-box-shadow: 0px 2px 12px 0px rgba(0,0,0,0.7);
+        box-shadow: 0px 2px 12px 0px rgba(0,0,0,0.7);
+        cursor:pointer;
+        transition: 0.5s;
+        hr{
+          width: 90%;
+          transition: 0.5s;
+          border-top:2px solid $info;
+          transition-timing-function: ease-in-out;
+        }
+
+        .name{
+          .name-text{
+            color:$info;
+            transition: 0.5s;
+          }
+        }
+      }
+     
+      hr{
+        margin: 0px;
+        width: 75%;
+        margin-left: auto;
+        margin-right: auto;
+        border-top:2px solid $primary;
+        transition: 0.5s;
+        border-radius:100%;
+      }
+
+      .image{
+        width: calc(100%);
+        height: calc(80% - 0px);
+        display: flex;
+        //border-bottom:5px solid $info;
+        img{
+          display: block;
+          max-width: calc(100% - 20px);
+          max-height: calc(100% - 20px);
+          margin: auto;
+          padding: 10px;
+          //padding: 10px;
+        }
+      }
+  
+      .name{
+        display: block;
+        width: calc(100% - 20px);
+        height: calc(20% - 20px);
+        padding:10px;
+        text-align: center;
+        color:$primary;
+        .name-text{
+          font-weight: normal;
+          margin:0px;
+          height: 100%;
+          transition: 0.5s;
+          
+        }
+        
+      }
     }
   }
   .w-50{width: 50% !important;}
@@ -72,21 +355,54 @@
     position: relative;
     width:20%;
     min-height:100vh;
-    background-color: white;
+    background-color:$primary;
+    border-bottom:1px solid $info;
+   // -webkit-box-shadow: 4px 2px 8px -1px rgba(0,0,0,0.12);
+   // -moz-box-shadow: 4px 2px 8px -1px rgba(0,0,0,0.12);
+   // box-shadow: 4px 2px 8px -1px rgba(0,0,0,0.12);
 
+  .list-header{
+    width: 90%;
+    margin: auto;
+    //border-radius: 10px;
+    //background-color: darken($info,10);
+    text-align: center;
+    color:white;
+    padding-top:5px;
+    padding-bottom:5px;
+    border-bottom:1px solid darken($info,10);
+    border-top:1px solid darken($info,10);
+    margin-bottom:35px;
+    .list-header-text{
+      //text-align: center;
+      font-weight: initial;
+      padding: 0px;
+      margin:0px;
+    }
+    
+  }
     .list-item{
       width: 90%;
       margin: auto;
       padding: 3px;
-      border-radius: 10px;
-      background-color: $info;
+      //border-radius: 10px;
+      background-color: darken($info,10);
       margin-top: 10px;
       text-align: center;
       color:white;
+      padding:5px;
+      padding-bottom: 10px;
+      //border-bottom: 1px solid $info;
+
+      
+      
+
 
       &:hover{
-        background-color: darken($info,10);
+        background-color: $info;
         cursor:pointer;
+        transition:0.3s;
+        animation-timing-function: ease-in-out;
       }
     }
   }

@@ -30,9 +30,8 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:5000/api/categories/
-Content-Type: application/json
+GET http://localhost:5000/api/breadcrumb/2/sc/
 
-{
-    "data":"data"
-}
+###
+
+GET http://localhost:5000/api/breadcrumb/1/c/

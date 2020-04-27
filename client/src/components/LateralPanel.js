@@ -1,7 +1,10 @@
 import React,{useRef,useEffect} from 'react';
 import '../App.scss';
 import {connect} from 'react-redux';
-import {toggleLateralPanel,fetchCategories,addPage} from '../Actions';
+import {initBreadcrumb,
+        toggleLateralPanel,
+        fetchCategories,
+        changePage} from '../Actions';
 import {OutsideClick} from '../OutsideClick';
 import { useHistory } from 'react-router-dom';
 
@@ -14,11 +17,13 @@ const LateralPanel = (props)=>{
         props.dispatch(fetchCategories())
     }, []);
     const history = useHistory();
+
     const categoriesList = categories.map(c =>  <div 
                                                 className="list-item"
                                                 onClick={()=>{
-                                                    props.dispatch(addPage(c.name,`/${c.name.toLowerCase()}/${c.id}/c`))
-                                                    props.dispatch(()=>history.push(`/${c.name.toLowerCase()}/${c.id}/c`))
+                                                    history.push(`/${c.name.toLowerCase()}/${c.id}/c`);
+                                                    props.dispatch(initBreadcrumb(c.id,'c'))
+                                                    props.dispatch(changePage())
                                                 }} 
                                                 key={c.name}>
                                                     {c.name}    
@@ -26,6 +31,10 @@ const LateralPanel = (props)=>{
     return (<div 
             ref={wrapperRef}
             className={`lateral-panel ${lateralPanelToggled?'open':'closed'}`}>
+                <div className="list-header">
+                    <h4 className="list-header-text">CATEGORII</h4>
+                </div>
+                
                 {categoriesList}
             </div>)
 };
