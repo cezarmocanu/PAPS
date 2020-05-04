@@ -1,10 +1,15 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {connect} from 'react-redux';
 import './../App.scss';
 import {toggleLateralPanel} from '../Actions';
 import {FaSearch} from 'react-icons/fa';
+import Select from './Select';
+
 const Header = (props) => {
     
+    
+    
+
 
     return (<nav className={`header`}>
                <div className="logo">
@@ -21,6 +26,7 @@ const Header = (props) => {
                         <FaSearch className="icon"/>
                     </div>
                 </div>
+                
                <button onClick={()=>props.dispatch(toggleLateralPanel(true))}className="md-down-show">CATEGORII</button>
             </nav>)
 }

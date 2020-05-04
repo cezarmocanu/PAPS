@@ -18,6 +18,9 @@ const imagemin = require('imagemin');
 const imageminMozjpeg = require('imagemin-mozjpeg');
 const imageminJpegtran = require('imagemin-jpegtran');
 const imageminPngquant = require('imagemin-pngquant');
+const logger = require('./logs/Logger');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 const storage = multer.diskStorage({
     destination:(req,file,cb)=>{
@@ -35,16 +38,22 @@ const generateAccessToken = (role) => {
     //de modificat sa primesaca ca parametru rolul din db
     return jwt.sign({role:role},process.env.ACCESS_TOKEN_SECRET,{expiresIn:'1h'})
 }
-/*
-{
-    origin: 'http://localhost:3000'
-  } */
-app.use(express.json())
-app.use(cors());
 
+const whitelist = [
+    "http://agrobrazdare.ro",
+    "https://agrobrazdare.ro",
+    "http://agrobrazdare.ro:5000",
+    "https://agrobrazdare.ro:5000",
+    "86.122.89.76:3000"
+]
+  
+app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors({origin:"*"}));
+
 //de facut check la token in momentul in care sunt facute requesturi la anumite rute
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.post('/admin/uploadimages', uploads.array('photos', 25),async (req, res, next) => {
     try {
@@ -84,7 +93,8 @@ app.post('/admin/uploadimages', uploads.array('photos', 25),async (req, res, nex
         
         }
     } catch (err) {
-        res.status(500).send(err);
+        logger.log(err);
+        return res.sendStatus(404);
     }
 })
 
@@ -221,11 +231,21 @@ app.post('/api/categories',async (req,res)=>{
     .catch(error => res.json({status:500,message:"Categoria nu a putut fi adaugata"}));
 });
 
+
 app.get('/api/categories',async (req,res)=>{
     return res.json(await Category.findAll({
                 where: {parent:null}
             }));
 })
+
+app.get('/api/subcategories',async (req,res)=>{
+    return res.json(await Category.findAll({
+                where: {parent:{
+                    [Op.not]:null
+                }}
+            }));
+})
+
 
 app.get('/api/categories/:id',async (req,res)=>{
     return res.json(await Category.findAll({
@@ -233,10 +253,18 @@ app.get('/api/categories/:id',async (req,res)=>{
             }));
 })
 
-app.get('/', async (req, res) => {
-    //(async ()=>{await sequelize.sync({ force: true });})()
-    return res.json(await Category.findAll());
+app.get('/logs', async (req, res) => {
+    return res.json(logger.messages);
 });
 
-app.listen(port, () => console.log(`Server listening on port ${port}!`));
+app.get('*', async (req, res) => {
+    return res.sendFile(path.join(__dirname,`client/build/index.html`));
+    //(async ()=>{await sequelize.sync({ force: true });})()
+  //  return res.json(await Category.findAll());
+});
+
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}!`)
+    logger.log(`Server listening on port ${port}!`)
+});
 

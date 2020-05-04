@@ -10,6 +10,10 @@ export const FETCH_CATEGORIES_BEGIN   = GEN_ID();
 export const FETCH_CATEGORIES_SUCCESS = GEN_ID();
 export const FETCH_CATEGORIES_FAILURE = GEN_ID();
 
+export const FETCH_ALL_SUBCATEGORIES_BEGIN   = GEN_ID();
+export const FETCH_ALL_SUBCATEGORIES_SUCCESS = GEN_ID();
+export const FETCH_ALL_SUBCATEGORIES_FAILURE = GEN_ID();
+
 export const POST_LOGIN_BEGIN   = GEN_ID();
 export const POST_LOGIN_SUCCESS = GEN_ID();
 export const POST_LOGIN_FAILURE = GEN_ID();
@@ -68,6 +72,11 @@ export const INIT_BREADCRUMB_FAILURE = GEN_ID();
 
 export const CLEAR_BREADCRUMB = GEN_ID();
 
+export const SELECT_PRODUCT_IMAGE_BEGIN = GEN_ID();
+export const SELECT_PRODUCT_IMAGE_CHOOSE = GEN_ID();
+export const SELECT_PRODUCT_IMAGE_DESELECT = GEN_ID();
+export const SELECT_PRODUCT_IMAGE_END = GEN_ID();
+
 
 
 //action creators
@@ -77,6 +86,10 @@ export const toggleLateralPanel = (value) => ({type:TOGGLE_LATERAL_PANEL,payload
 export const fetchCategoriesBegin = () => ({type:FETCH_CATEGORIES_BEGIN})
 export const fetchCategoriesSuccess = (categories) => ({type:FETCH_CATEGORIES_SUCCESS,payload:categories})
 export const fetchCategoriesFailure = (error) => ({type:FETCH_CATEGORIES_FAILURE,payload:error})
+
+export const fetchAllSubcategoriesBegin = () => ({type:FETCH_ALL_SUBCATEGORIES_BEGIN});
+export const fetchAllSubcategoriesSuccess = (subcategories) => ({type:FETCH_ALL_SUBCATEGORIES_SUCCESS,payload:subcategories});
+export const fetchAllSubcategoriesFailure = () => ({type:FETCH_ALL_SUBCATEGORIES_FAILURE});
 
 export const postLoginBegin = () => ({type:POST_LOGIN_BEGIN})
 export const postLoginSuccess = (tokenData) => ({type:POST_LOGIN_SUCCESS,payload:tokenData})
@@ -136,7 +149,14 @@ export const initBreadcrumbFailure = () => ({type:INIT_BREADCRUMB_FAILURE});
 
 export const clearBreadcrumb = (lastCrumb) => ({type:CLEAR_BREADCRUMB,payload:lastCrumb});
 
-const host = "http://localhost:5000";
+export const selectProductImageBegin = () =>({type:SELECT_PRODUCT_IMAGE_BEGIN})
+export const selectProductImageChoose = (imageId) =>({type:SELECT_PRODUCT_IMAGE_CHOOSE,payload:imageId})
+export const selectProductImageDeselect = (imageId) =>({type:SELECT_PRODUCT_IMAGE_DESELECT,payload:imageId})
+export const selectProductImageEnd = () =>({type:SELECT_PRODUCT_IMAGE_END})
+
+//const host = "http://localhost:5000";
+const host = "http://192.168.1.111:5000";
+//const host = "https://agrobrazdare.ro";
 
 export const B64toJSON = (s) => {
   try {
@@ -324,6 +344,18 @@ export const fetchSubcategories = (idCategory) =>{
       
     })
     .catch(error => dispatch(fetchSubcategoriesFailure()))
+  }
+}
+
+export const fetchAllSubcategories = () => {
+  return dispatch => {
+    dispatch(fetchAllSubcategoriesBegin);
+    return fetch(`${host}/api/subcategories/`)
+    .then(res => res.json())
+    .then((json) => {
+      dispatch(fetchAllSubcategoriesSuccess(json))
+    })
+    .catch(error => dispatch(fetchAllSubcategoriesFailure()))
   }
 }
 

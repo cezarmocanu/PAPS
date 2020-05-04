@@ -16,9 +16,15 @@ import {reloadToken,
         selectCategoryImageBegin,
         selectCategoryImageChoose,
         selectCategoryImageEnd,
-        postCategory
+        postCategory,
+        selectProductImageBegin,
+        selectProductImageChoose,
+        selectProductImageDeselect,
+        selectProductImageEnd,
+        fetchAllSubcategories
         } from '../Actions';
-
+import Carousel from './Carousel';
+import Select from './Select';
 
 const AdminUI = (props) => {
 
@@ -30,7 +36,11 @@ const AdminUI = (props) => {
            galleryShouldReload,
            selectCategoryImage,
            newCategoryImage,
-           categories
+           categories,
+           selectProductImages,
+           selectedProductImageIds,
+           productPreviewImages,
+           allSubcategories
            } = props;
     const [showUpload,setShowUpload] = useState(false);
     const [open, setOpen] = useState(false);
@@ -78,6 +88,7 @@ const AdminUI = (props) => {
     useEffect(() => {
         props.dispatch(reloadToken(JSON.stringify({token:localStorage.getItem('token')})));
         props.dispatch(fetchAllImages([]));
+        props.dispatch(fetchAllSubcategories());
     }, []);
 
     const removeImageFromUpload = (name) => {
@@ -95,6 +106,7 @@ const AdminUI = (props) => {
         })
         props.dispatch(postUploadQueue(formData))
         props.dispatch(clearUploadQueue());
+        
         //
     }
 
@@ -114,16 +126,24 @@ const AdminUI = (props) => {
                     </div>)
     }) 
 
-    const galleryClickAction = (image)=>{
+    const galleryClickAction = (image,isCounted)=>{
         if(selectCategoryImage)
             props.dispatch(selectCategoryImageChoose(image));
-        
+        if(selectProductImages)
+            if(isCounted)
+                props.dispatch(selectProductImageDeselect(image.id));
+            else
+                props.dispatch(selectProductImageChoose(image.id));
     }            
     
     const galleryImagesList = galleryImages.map((image,index) =>{
                     const isSelected = newCategoryImage !== undefined && image.id === newCategoryImage.id;
-                    return (<div className="gallery-item" key={index} onClick={()=>galleryClickAction(image)}>
+                    const indexOfImage = selectedProductImageIds.indexOf(image.id)
+                    const isCounted = indexOfImage > -1 ? indexOfImage + 1:undefined;
+                    return (<div className="gallery-item" key={index} onClick={()=>galleryClickAction(image,isCounted)}>
                             {isSelected && selectCategoryImage && <div className="select-box"></div>}
+                            {selectProductImageBegin && <div className="deselect-overlay"></div>}
+                            {selectProductImages &&  isCounted && <div className={`image-select-index`}><span>{isCounted}</span></div>}
                             <div className={`image`}>
                                 <img src={image.data}/>
                             </div>
@@ -168,13 +188,23 @@ const AdminUI = (props) => {
                                         </div>
                                         {selectCategoryImage && 
                                         <div className="select-images-button" onClick={()=>props.dispatch(selectCategoryImageEnd())}>
-                                            <p>Alege Imaginea</p>
+                                            <p>Confimra Imaginea</p>
+                                        </div>}
+                                        {selectProductImages &&
+                                         selectedProductImageIds.length > 0 && 
+                                        <div className="select-images-button" onClick={()=>props.dispatch(selectProductImageEnd())}>
+                                            <p>Confirma Imaginile</p>
                                         </div>}
                                     </div>)}]
 
 
     const [categoryFormData, setCategoryFormData] = useState({name:"",parentId:null})
-
+    const [productFormData, setProductFormData] = useState({name:"",
+                                                            code:"",
+                                                            hasPrice:false,
+                                                            price:-1,
+                                                            categoryId:"",
+                                                            description:""})
     const submitCategoryForm = (e)=>{
         e.preventDefault();
         const data = {
@@ -256,8 +286,114 @@ const AdminUI = (props) => {
                                         Content Modifica Categoriile
                                     </div>)}]
 
+    const selectOptionsP = [{name:"optiune1 dar are textul mai lung decat majoritatea",value:1},
+                            {name:"optiune2",value:2},
+                            {name:"optiune3",value:3}];
+    const [selectedProductSubcategory, setSelectedProductSubcategory] = useState({});
+    const selectProductSubcategory = <Select
+                            onChange={o=>setSelectedProductSubcategory(o)}
+                            options={allSubcategories}
+                            />;
+
     const productSuboptions = [{name:'Adauga Produse Noi',
-                                content:(<div>Content ADauga Produse</div>)}]
+                                content:(<div className="submenu-content">
+                                <div className="product-content-container category-content-container">
+                                    <div className="product-form">
+                                        <form onSubmit={submitCategoryForm}>
+                                            <div className="form-input text">
+                                                <input
+                                                className="text-input" 
+                                                name="name" 
+                                                type="text"
+                                                required/>
+                                                <span className="label" 
+                                                >Numele Produsului</span>
+                                            </div>
+                                            <div className="form-input text">
+                                                <input
+                                                className="text-input" 
+                                                name="name" 
+                                                type="text"
+                                                required/>
+                                                <span className="label" 
+                                                >Codul Produsului</span>
+                                            </div>
+                                            <div className="form-input">
+                                                <label  htmlFor="category">Categorie</label>
+                                                {selectProductSubcategory}
+                                            </div>
+                                            <div className="form-input">
+                                                <label htmlFor="name">Are Pret?</label>
+                                                <input
+                                                className="has-price" 
+                                                type="checkbox"
+                                                />                                               
+                                            </div>
+                                            <div className="form-input text">
+                                                <input
+                                                className="text-input" 
+                                                name="name" 
+                                                type="text"
+                                                required/>
+                                                <span className="label" 
+                                                >Pret</span>
+                                            </div>
+                                            <div className="form-input">
+                                                    <label  htmlFor="imageId">Imagini Galerie</label>
+                                                    <input 
+                                                    name="imageId" 
+                                                    type="hidden" 
+                                                    value={1}/>
+                                                    <button
+                                                    className="button-input"
+                                                    type="button"  
+                                                    onClick={()=>props.dispatch(selectProductImageBegin())}>Modifica Galeria</button>
+                                            </div>
+                                            <div className="form-input text">
+                                                <input
+                                                className="text-input" 
+                                                name="name" 
+                                                type="text"
+                                                required/>
+                                                <span className="label" 
+                                                >Descriere</span>
+                                            </div>
+                                            <div className="form-input">
+                                                <input 
+                                                className="button-input" 
+                                                type="submit" 
+                                                value="Salveaza Produsul"/>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div className="product-preview-container">
+                                        <div className="product-gallery-preview">
+                                            <div className="carousel-container">
+                                                <Carousel slides={productPreviewImages}/>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="product-preview">    
+                                            <div className="image">
+                                                {productPreviewImages.length !== undefined &&
+                                                 productPreviewImages.length > 0 &&
+                                                <img src={productPreviewImages[0].data}/>}
+                                            </div>
+                                            <div className="details">
+                                                <hr/>
+                                                {<h3 className="name-text">SEGM U650 D108 SEGMOT MF</h3>}
+                                                {<h4 className="code-text">TS01.10</h4>}
+                                                <div className="price">
+                                                    {<h4 className="price-text">147.57 lei </h4>}
+                                                    {<h4 className="unit-text">/ buc</h4>}
+                                                </div>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>    
+                                </div>
+                            </div>)}]
 
     const generalSettingsSuboptions = [{name:'Setari Generale',
                                         content:(<div>Content Setari Generale</div>)}]
@@ -265,7 +401,7 @@ const AdminUI = (props) => {
 
     const options = [{icon:'I',
                       name:'Imagini',
-                      content:(<div>
+                      content:(<div className="option-box">
                                     {currentAdminSubmenu < imageSuboptions.length && 
                                     imageSuboptions[currentAdminSubmenu].content}
                                     <div className="submenu">
@@ -279,7 +415,7 @@ const AdminUI = (props) => {
                       ref:useRef(null)},
                      {icon:'C',
                       name:'Categorii',
-                      content:(<div>
+                      content:(<div className="option-box">
                                 {currentAdminSubmenu < categorySuboptions.length && 
                                 categorySuboptions[currentAdminSubmenu].content}
                                 <div className="submenu">
@@ -293,7 +429,7 @@ const AdminUI = (props) => {
                       ref:useRef(null)},
                      {icon:'P',
                       name:'Produse',
-                      content:(<div>
+                      content:(<div className="option-box">
                                     {currentAdminSubmenu < productSuboptions.length && 
                                     productSuboptions[currentAdminSubmenu].content}
                                     <div className="submenu">
@@ -307,7 +443,7 @@ const AdminUI = (props) => {
                       ref:useRef(null)},
                      {icon:'SG',
                       name:'Setari Generale',
-                      content:(<div>
+                      content:(<div className="option-box">
                                 {currentAdminSubmenu < generalSettingsSuboptions.length &&  
                                 generalSettingsSuboptions[currentAdminSubmenu].content}
                                 <div className="submenu">
@@ -362,7 +498,11 @@ const mapStateToProps = (state) => ({
     notifications:state.notifications,
     selectCategoryImage:state.selectCategoryImage,
     newCategoryImage:state.newCategoryImage,
-    categories:state.categories
+    categories:state.categories,
+    selectProductImages:state.selectProductImages,
+    selectedProductImageIds:state.selectedProductImageIds,
+    productPreviewImages:state.productPreviewImages,
+    allSubcategories:state.allSubcategories
     
 })
 

@@ -6,7 +6,6 @@ import './../App.scss';
 const Footer = (props) => {
     
     return (<div className={`footer`}>
-               
             </div>)
 }
 

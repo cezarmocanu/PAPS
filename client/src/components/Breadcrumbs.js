@@ -19,6 +19,7 @@ const Breadcrumbs = (props)=>{
 
 
     const breadcrumb = breadcrumbPath.map(crumb => <div
+                                                    key={crumb.url}
                                                     className="crumb"
                                                     onClick={()=>{
                                                         props.dispatch(clearBreadcrumb(crumb));

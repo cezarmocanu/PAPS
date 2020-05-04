@@ -8,6 +8,7 @@ import LateralPanel from './components/LateralPanel';
 import Main from './components/Main';
 import thunk from 'redux-thunk';
 import './App.scss';
+import {Helmet} from "react-helmet";
 import './Actions';
 import { //ADD_PAGE,
          //CLEAR_PAGE,
@@ -31,6 +32,7 @@ import { //ADD_PAGE,
          CHANGE_ADMIN_SUBMENU,
          CHANGE_ADMIN_MENU,
          POST_UPLOAD_QUEUE_SUCCESS,
+         POST_UPLOAD_QUEUE_FAILURE,
          //FETCH_ALL_IMAGES_BEGIN,
          FETCH_ALL_IMAGES_SUCCESS,
          //FETCH_ALL_IMAGES_FAILURE,
@@ -43,7 +45,13 @@ import { //ADD_PAGE,
          FETCH_CLIENT_IMAGE_SUCCESS,
          CHANGE_PAGE,
          INIT_BREADCRUMB_SUCCESS,
-         CLEAR_BREADCRUMB
+         CLEAR_BREADCRUMB,
+         SELECT_PRODUCT_IMAGE_BEGIN,
+         SELECT_PRODUCT_IMAGE_CHOOSE,
+         SELECT_PRODUCT_IMAGE_END,
+         SELECT_PRODUCT_IMAGE_DESELECT,
+         FETCH_ALL_SUBCATEGORIES_FAILURE,
+         FETCH_ALL_SUBCATEGORIES_SUCCESS,
         } from './Actions';
 import Footer from './components/Footer';
 
@@ -54,6 +62,7 @@ const initialState = {
   breadcrumbsInitialized:false,
   categories:[],
   subcategories:[],
+  allSubcategories:[],
   role:undefined,
   hasAdmins:undefined,
   signupSuccess:undefined,
@@ -66,7 +75,10 @@ const initialState = {
   selectCategoryImage:false,
   newCategoryImage:undefined,
   imagesHashMap:{},
-  pageReload:[]
+  pageReload:[],
+  selectProductImages:false,
+  selectedProductImageIds:[],
+  productPreviewImages:[]
   
 }
 
@@ -158,6 +170,11 @@ function reducer(state=initialState,action){
         ...state,
         galleryShouldReload:true
       }
+    case POST_UPLOAD_QUEUE_FAILURE:
+      console.log(action.payload);
+      return{
+        ...state
+      }
     case CHANGE_ADMIN_SUBMENU:
       return{
         ...state,
@@ -239,6 +256,44 @@ function reducer(state=initialState,action){
         ...state,
         breadcrumbPath:[...state.breadcrumbPath.splice(0,lastCrumbIndex+1)]
       }
+    case SELECT_PRODUCT_IMAGE_BEGIN:
+      return {
+        ...state,
+        currentAdminMenu:0,
+        currentAdminSubmenu:1,
+        selectProductImages:true
+      }
+    case SELECT_PRODUCT_IMAGE_CHOOSE:
+      return {
+        ...state,
+        selectedProductImageIds:[...state.selectedProductImageIds,action.payload]
+      }
+    case SELECT_PRODUCT_IMAGE_DESELECT:
+      state.selectedProductImageIds.splice(state.selectedProductImageIds.indexOf(action.payload),1);
+      return{
+        ...state,
+        selectedProductImageIds:[...state.selectedProductImageIds]
+      }
+    case SELECT_PRODUCT_IMAGE_END:
+      const previewImages = [];
+      state.galleryImages.map(img =>{
+        if(state.selectedProductImageIds.includes(img.id))
+          previewImages[state.selectedProductImageIds.indexOf(img.id)] = img; 
+      });
+      return {
+        ...state,
+        currentAdminMenu:2,
+        currentAdminSubmenu:0,
+        selectProductImages:false,
+        productPreviewImages:[...previewImages]
+      }
+    case FETCH_ALL_SUBCATEGORIES_SUCCESS:
+      const subcategoryOptions = action.payload.map(sb =>({name:sb.name, value:sb.id}))
+      console.log(subcategoryOptions);
+      return {
+        ...state,
+        allSubcategories:[...subcategoryOptions]
+      }
     default:
       return state;
   }
@@ -252,6 +307,11 @@ const App = () => {
   
   return (
     <div className="App">
+      <Helmet>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="description" content=""></meta>
+        <title>Piese Tractoare Agricole-Utilaje Viticole|Agrobrazdare</title>
+      </Helmet>
       <Provider store={store}>
         <Router>
           <Header/>
