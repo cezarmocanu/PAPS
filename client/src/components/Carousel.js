@@ -9,6 +9,7 @@ const Carousel = (props) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const previewSlides = slides.map((s,index) => <div 
+                                                    key={index}
                                                     onClick={()=>{setCurrentIndex(index)}}
                                                     className={`preview-box ${index === currentIndex && "active"}`}>
                                                         <img src={s.data}/>
@@ -24,28 +25,45 @@ const Carousel = (props) => {
 
     }, [currentIndex])
 
-    return (slides.length > 0 && 
+    return (
             <div className="carousel">
-                <div className="main-container">
-                    <div 
-                    onClick={()=>{setCurrentIndex((slides.length + currentIndex - 1)%slides.length)}}
-                    className="arrow-left">
-                        <FaChevronLeft/>
-                    </div>
-                    <div className="current-slide">
-                        <div className="slide-container">
-                            <img src={slides[currentIndex].data}/>
+                {   slides.length > 0 && (
+                        <div className="main-container">
+                        <div 
+                        onClick={()=>{setCurrentIndex((slides.length + currentIndex - 1)%slides.length)}}
+                        className="arrow-left">
+                            <FaChevronLeft/>
                         </div>
-                    </div>
-                    <div 
-                    onClick={()=>{setCurrentIndex((currentIndex+1)%slides.length)}}
-                    className="arrow-right">
-                        <FaChevronRight/>
-                    </div>
-                </div>
-                <div className="preview-section">
+                        <div className="current-slide">
+                            <div className="slide-container">
+                                <img src={slides[currentIndex].data}/>
+                            </div>
+                        </div>
+                        <div 
+                        onClick={()=>{setCurrentIndex((currentIndex+1)%slides.length)}}
+                        className="arrow-right">
+                            <FaChevronRight/>
+                        </div>
+                    </div>)}
+                {   slides.length > 0 && 
+                    <div className="preview-section">
                     {previewSlides}
-                </div>
+                    </div>
+                }
+                {
+                    slides.length <= 0 &&
+                    <div className="empty-slide">
+                        <div className="logo">
+                            <div className="logo-content">
+                                <span className="capital">A</span>
+                                <span>GRO</span>
+                                <span className="capital">B</span>
+                                <span>RAZDARE</span>
+                            </div>
+                        </div>
+                        <span className="indications">Alegeti Imaginile Pentru Galeria Produsului</span>
+                    </div>
+                }
 
             </div>)
 }

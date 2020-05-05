@@ -79,6 +79,8 @@ export const SELECT_PRODUCT_IMAGE_END = GEN_ID();
 
 
 
+
+
 //action creators
 
 export const toggleLateralPanel = (value) => ({type:TOGGLE_LATERAL_PANEL,payload:value})
@@ -153,6 +155,8 @@ export const selectProductImageBegin = () =>({type:SELECT_PRODUCT_IMAGE_BEGIN})
 export const selectProductImageChoose = (imageId) =>({type:SELECT_PRODUCT_IMAGE_CHOOSE,payload:imageId})
 export const selectProductImageDeselect = (imageId) =>({type:SELECT_PRODUCT_IMAGE_DESELECT,payload:imageId})
 export const selectProductImageEnd = () =>({type:SELECT_PRODUCT_IMAGE_END})
+
+
 
 //const host = "http://localhost:5000";
 const host = "http://192.168.1.111:5000";
@@ -292,11 +296,9 @@ export const fetchAllImages = (currentImages) => {
 }
 
 function arrayBufferToBase64(buffer) {
-  var binary = '';
-  var bytes = [].slice.call(new Uint8Array(buffer));
-
+  let binary = '';
+  let bytes = [].slice.call(new Uint8Array(buffer));
   bytes.forEach((b) => binary += String.fromCharCode(b));
-
   return window.btoa(binary);
 };
 
@@ -386,3 +388,54 @@ export const initBreadcrumb = (id,symbol) => {
     .catch(error =>dispatch(initBreadcrumbFailure()))
   }
 }
+
+
+
+const ACTION_TYPES = [
+  {name:'POST_PRODUCT_DATA',thunk:true}
+];
+
+const TYPES = {};
+const ACTIONS = {};
+ACTION_TYPES.map(T => {
+                        if(T.thunk === undefined)
+                          return TYPES[T] = T;
+                        TYPES[`${T.name}_BEGIN`] =`${T.name}_BEGIN`;
+                        TYPES[`${T.name}_SUCCESS`] =`${T.name}_SUCCESS`;
+                        TYPES[`${T.name}_FAILURE`] =`${T.name}_FAILURE`; 
+                        return;
+                      });
+ACTION_TYPES.map(T => {
+                        if(T.thunk === undefined){
+                          const fName = (T.toLowerCase().split("_").map((w,index) => index==0?w:w.charAt(0).toUpperCase()+w.slice(1))).join('');
+                          return ACTIONS[fName] = (payload)=>({type:T,payload:payload});
+                        }
+                        const fName = (T.name.toLowerCase().split("_").map((w,index) => index==0?w:w.charAt(0).toUpperCase()+w.slice(1))).join('');
+                        ACTIONS[`${fName}Begin`] = (payload)=>({type:`${T.name}_BEGIN`,payload:payload});
+                        ACTIONS[`${fName}Success`] = (payload)=>({type:`${T.name}_SUCCESS`,payload:payload});
+                        ACTIONS[`${fName}Failure`] = (payload)=>({type:`${T.name}_FAILURE`,payload:payload});
+                        return;
+                    });
+
+export const postProductData = (data) => {
+  return dispatch => {
+    dispatch(ACTIONS.postProductDataBegin());
+    console.log(data)
+    return fetch(`${host}/api/products`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(() => {
+      dispatch(ACTIONS.postProductDataSuccess())
+    })
+    .catch(error => dispatch(ACTIONS.postProductDataFailure()))
+    //fetch()
+  }
+}
+
+export const REDUX_TYPES = {...TYPES};
+export const REDUX_ACTIONS = {...ACTIONS};

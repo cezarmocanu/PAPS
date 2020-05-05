@@ -21,8 +21,8 @@ import {reloadToken,
         selectProductImageChoose,
         selectProductImageDeselect,
         selectProductImageEnd,
-        fetchAllSubcategories
-        } from '../Actions';
+        fetchAllSubcategories,
+        postProductData} from '../Actions';
 import Carousel from './Carousel';
 import Select from './Select';
 
@@ -202,9 +202,12 @@ const AdminUI = (props) => {
     const [productFormData, setProductFormData] = useState({name:"",
                                                             code:"",
                                                             hasPrice:false,
-                                                            price:-1,
+                                                            price:0,
                                                             categoryId:"",
-                                                            description:""})
+                                                            description:"",
+                                                            unit:""})
+    const [canSubmitProductForm, setCanSubmitProductForm] = useState(false)                                                           
+
     const submitCategoryForm = (e)=>{
         e.preventDefault();
         const data = {
@@ -213,7 +216,7 @@ const AdminUI = (props) => {
         }
         props.dispatch(postCategory(data));
         props.dispatch(selectCategoryImageChoose(undefined))
-        setCategoryFormData({...categoryFormData,name:""})
+        setCategoryFormData({...categoryFormData,name:"",categoryId:""})
     }
 
     const onChangeCategoryForm = (e)=>{
@@ -286,25 +289,60 @@ const AdminUI = (props) => {
                                         Content Modifica Categoriile
                                     </div>)}]
 
-    const selectOptionsP = [{name:"optiune1 dar are textul mai lung decat majoritatea",value:1},
-                            {name:"optiune2",value:2},
-                            {name:"optiune3",value:3}];
-    const [selectedProductSubcategory, setSelectedProductSubcategory] = useState({});
     const selectProductSubcategory = <Select
-                            onChange={o=>setSelectedProductSubcategory(o)}
+                            onChange={o => setProductFormData({...productFormData,categoryId:o.value})}
                             options={allSubcategories}
                             />;
+
+    const onChangeProductForm = (e)=>{
+        if(e.target.name !== "hasPrice"){
+            e.preventDefault(); 
+            return setProductFormData({
+                ...productFormData,
+                [e.target.name]:e.target.value
+            })
+        }
+        return setProductFormData({
+            ...productFormData,
+            [e.target.name]:e.target.checked
+        })
+    }
+
+    const submitProductForm = (e)=>{
+        e.preventDefault();
+        props.dispatch(postProductData({
+            ...productFormData,
+            galleryImages:[...selectedProductImageIds]
+        }))
+    }
+
+    useEffect(() => {
+        const hasError = [
+            productFormData.name==="",
+            productFormData.code==="",
+            productFormData.categoryId==="",
+            productFormData.categoryId==="novalue",
+            productFormData.description==="",
+            productFormData.hasPrice===true && productFormData.price <= 0,
+            productFormData.hasPrice===true && isNaN(parseFloat(productFormData.price)),
+            productFormData.hasPrice===true && productFormData.unit==="",
+            selectedProductImageIds.length <= 0
+        ];
+        setCanSubmitProductForm(!hasError.includes(true))
+    }, [productFormData])
 
     const productSuboptions = [{name:'Adauga Produse Noi',
                                 content:(<div className="submenu-content">
                                 <div className="product-content-container category-content-container">
                                     <div className="product-form">
-                                        <form onSubmit={submitCategoryForm}>
+                                        <form onSubmit={submitProductForm}>
                                             <div className="form-input text">
                                                 <input
-                                                className="text-input" 
+                                                className="text-input"
+                                                onChange={onChangeProductForm} 
                                                 name="name" 
                                                 type="text"
+                                                value={productFormData.name}
                                                 required/>
                                                 <span className="label" 
                                                 >Numele Produsului</span>
@@ -312,8 +350,10 @@ const AdminUI = (props) => {
                                             <div className="form-input text">
                                                 <input
                                                 className="text-input" 
-                                                name="name" 
+                                                onChange={onChangeProductForm}
+                                                name="code" 
                                                 type="text"
+                                                value={productFormData.code}
                                                 required/>
                                                 <span className="label" 
                                                 >Codul Produsului</span>
@@ -322,22 +362,42 @@ const AdminUI = (props) => {
                                                 <label  htmlFor="category">Categorie</label>
                                                 {selectProductSubcategory}
                                             </div>
-                                            <div className="form-input">
-                                                <label htmlFor="name">Are Pret?</label>
+                                            <div className="form-input checkbox">
+                                                <label htmlFor="hasPrice">Are Pret?</label>
                                                 <input
-                                                className="has-price" 
+                                                className="has-price"
+                                                onChange={onChangeProductForm}
+                                                checked={productFormData.hasPrice}
+                                                name="hasPrice"
                                                 type="checkbox"
                                                 />                                               
                                             </div>
+                                            {productFormData.hasPrice &&
                                             <div className="form-input text">
                                                 <input
                                                 className="text-input" 
-                                                name="name" 
+                                                onChange={onChangeProductForm}
+                                                name="price" 
                                                 type="text"
+                                                value={productFormData.price}
                                                 required/>
                                                 <span className="label" 
-                                                >Pret</span>
+                                                >Pret</span>   
                                             </div>
+                                            }
+                                            {productFormData.hasPrice &&
+                                            <div className="form-input text">
+                                                <input
+                                                className="text-input" 
+                                                onChange={onChangeProductForm}
+                                                name="unit" 
+                                                type="text"
+                                                value={productFormData.unit}
+                                                required/>
+                                                <span className="label" 
+                                                >Unitate De Masura</span>   
+                                            </div>
+                                            } 
                                             <div className="form-input">
                                                     <label  htmlFor="imageId">Imagini Galerie</label>
                                                     <input 
@@ -352,18 +412,23 @@ const AdminUI = (props) => {
                                             <div className="form-input text">
                                                 <input
                                                 className="text-input" 
-                                                name="name" 
+                                                onChange={onChangeProductForm}
+                                                name="description" 
                                                 type="text"
+                                                value={productFormData.description}
                                                 required/>
                                                 <span className="label" 
                                                 >Descriere</span>
                                             </div>
+                                            {canSubmitProductForm &&
                                             <div className="form-input">
                                                 <input 
                                                 className="button-input" 
                                                 type="submit" 
                                                 value="Salveaza Produsul"/>
                                             </div>
+                                            }
+                                            
                                         </form>
                                     </div>
                                     <div className="product-preview-container">
@@ -381,13 +446,14 @@ const AdminUI = (props) => {
                                             </div>
                                             <div className="details">
                                                 <hr/>
-                                                {<h3 className="name-text">SEGM U650 D108 SEGMOT MF</h3>}
-                                                {<h4 className="code-text">TS01.10</h4>}
-                                                <div className="price">
-                                                    {<h4 className="price-text">147.57 lei </h4>}
-                                                    {<h4 className="unit-text">/ buc</h4>}
-                                                </div>
-                                                
+                                                {<h3 className="name-text">{productFormData.name===""?"Adaugati un nume de produs":productFormData.name}</h3>}
+                                                {<h4 className="code-text">{productFormData.code===""?"Adaugati un cod de produs":productFormData.code}</h4>}
+                                                {productFormData.hasPrice &&
+                                                    <div className="price">
+                                                        {<h4 className="price-text">{isNaN(productFormData.price)?"Pret":productFormData.price} lei</h4>}
+                                                        {<h4 className="unit-text">/ {productFormData.unit===""?"Nume Unitate":productFormData.unit}</h4>}
+                                                    </div>
+                                                }
                                             </div>
                                             
                                         </div>

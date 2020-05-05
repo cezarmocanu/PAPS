@@ -39,3 +39,7 @@ GET http://localhost:5000/api/breadcrumb/1/c/
 ###
 
 GET http://localhost:5000/api/subcategories/
+
+###
+
+GET http://localhost:5000/api/subcategories/13

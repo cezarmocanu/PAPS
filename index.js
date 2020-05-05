@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT | 5000;
 const Category = require('./models/Category');
+const Product = require('./models/Product');
+const GalleryItem = require('./models/GalleryItem');
 const Admin = require('./models/Admin');
 const Image = require('./models/Image');
 const sequelize = require('./models/sequelizeConfig');
@@ -246,11 +248,45 @@ app.get('/api/subcategories',async (req,res)=>{
             }));
 })
 
+app.get('/api/subcategories/:id',async (req,res)=>{
+    return res.json(await Product.findAll({
+                where: {categoryId:req.params.id}
+            }));
+})
 
 app.get('/api/categories/:id',async (req,res)=>{
     return res.json(await Category.findAll({
                 where: {parent:req.params.id}
             }));
+})
+
+/*
+  name: 'Hello',
+  code: 'bdsjbkgjs',
+  hasPrice: true,
+  price: '12',
+  categoryId: 2,
+  description: 'efwefw',
+  unit: 'cub',
+*/
+
+app.post('/api/products/',async (req,res)=>{
+    //console.log(req.body);
+    const {name,code,hasPrice,price,unit,categoryId,description,galleryImages} = req.body;
+    //n,c,hP,p,u,cI,d
+    await Product.create({name:name,
+                          code:code,
+                          hasPrice:hasPrice,
+                          price:hasPrice ? parseFloat(price) : null,
+                          unit:hasPrice ? unit : null,
+                          categoryId:categoryId,
+                          description:description})
+    .then(newProduct => {  
+
+        return Promise.all(galleryImages.map((gI,index) => GalleryItem.create({productId:newProduct.dataValues.id,imageId:gI,orderIndex:index})))
+                      .then(()=>res.send(200))
+                      .catch(()=>res.send(500));
+    })
 })
 
 app.get('/logs', async (req, res) => {

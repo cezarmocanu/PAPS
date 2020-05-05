@@ -58,6 +58,17 @@
     &.open{
       ul{display: block;} 
     }
+
+    &.valid{
+      
+      .selected{
+        border-bottom:2px solid $confirm;
+        span{
+          color:$confirm;
+        }
+        
+      }
+    }
     
     .selected{
       margin-top:5px;
@@ -70,6 +81,7 @@
       &:hover{
         cursor: pointer !important;
       }  
+
 
     }
     ul{
@@ -483,6 +495,47 @@
     }
   }
 
+  .empty-slide{
+    background-color: $primary;
+    display: flex;
+    flex-flow: column;
+    .logo{
+      color:white;  
+      height:max-content !important;
+      display: flex;
+      margin-top: auto;
+   //   margin-bottom:auto;
+      .logo-content{
+        margin:auto;
+        width: max-content !important;
+        height: max-content !important;
+        .capital{
+          display: flex;
+          margin-top:auto;
+          font-size: 2em;
+        }
+        span{
+          font-size: 1.4em;
+          display: flex;
+          margin-top:auto;
+        }
+      }
+    }
+    .indications{
+      height:max-content !important;
+      display: flex;
+      width: 80%;
+      margin-left:auto;
+      margin-right:auto;
+      margin-top: 20px;
+      border-top:1px solid white;
+      margin-bottom:auto;
+      text-align: center;
+      color:white;
+      font-size:1.3em;
+    }
+  }
+
   .header{
     height: $header-height;
     background-color: $primary;
@@ -492,7 +545,7 @@
       width:20%;
       height:100%;
       display: flex;
-      .content{
+      .logo-content{
         margin:auto;
         .capital{
           font-size: 2em;
@@ -840,12 +893,12 @@
               
               .select-images-button{
                 width: 100%;
-                background-color: $warning;
+                background-color: $confirm;
                 height: 10%;
                 font-size:1.5em;
                 
                 &:hover{
-                  background-color: darken($warning,10);
+                  background-color: darken($confirm,10);
                   cursor:pointer;
                 }
 
@@ -1175,6 +1228,14 @@
                       height: max-content !important;
                     }
                   }
+
+                  .form-input.checkbox{
+                    display:flex;
+                    flex-flow: row;
+                    label{width: 50%;}
+                    input{width:50%;}
+
+                  }
                   .form-input.text{
                     margin-top:20px;
                     position: relative;
@@ -1213,7 +1274,6 @@
                         font-size: 0.9375rem;
                         margin-bottom: 32px;
                         transition: top .2s;
-
                       }
 
                       &:valid+.label{
@@ -1221,6 +1281,11 @@
                         font-size: 0.9375rem;
                         margin-bottom: 32px;
                         transition: top .2s;
+                      }
+
+                      &:valid{
+                        color:$confirm;
+                        border-bottom: 2px solid $confirm;
                       }
                     }
 

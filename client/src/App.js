@@ -52,9 +52,9 @@ import { //ADD_PAGE,
          SELECT_PRODUCT_IMAGE_DESELECT,
          FETCH_ALL_SUBCATEGORIES_FAILURE,
          FETCH_ALL_SUBCATEGORIES_SUCCESS,
+         REDUX_ACTIONS,REDUX_TYPES
         } from './Actions';
 import Footer from './components/Footer';
-
 
 const initialState = {
   lateralPanelToggled:false,
@@ -289,10 +289,13 @@ function reducer(state=initialState,action){
       }
     case FETCH_ALL_SUBCATEGORIES_SUCCESS:
       const subcategoryOptions = action.payload.map(sb =>({name:sb.name, value:sb.id}))
-      console.log(subcategoryOptions);
       return {
         ...state,
         allSubcategories:[...subcategoryOptions]
+      }
+    case REDUX_TYPES.POST_PRODUCT_DATA_SUCCESS:
+      return {
+        ...state
       }
     default:
       return state;

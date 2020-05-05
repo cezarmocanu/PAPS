@@ -14,12 +14,12 @@ const Select = (props) => {
         onChange(selectedOption);
     }, [selectedOption]);
 
-    const optionList = options.map(o => <li onClick={()=>{setSelectedOption(o)}}>{o.name}</li>)
+    const optionList = options.map(o => <li key={o.name} onClick={()=>{setSelectedOption(o)}}>{o.name}</li>)
 
     return <div 
             ref={wrapperRef}
             onClick={()=>setOpen(!open)} 
-            className={`custom-select ${open?'open':""}`}>
+            className={`custom-select ${open?'open':""} ${selectedOption.value!=="novalue"?"valid":""}`}>
             <div className={`selected`}>
                 <span>{selectedOption.name}</span>
             </div>

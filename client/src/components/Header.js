@@ -6,14 +6,10 @@ import {FaSearch} from 'react-icons/fa';
 import Select from './Select';
 
 const Header = (props) => {
-    
-    
-    
-
 
     return (<nav className={`header`}>
                <div className="logo">
-                    <div className="content">
+                    <div className="logo-content">
                         <span className="capital">A</span>
                         <span>GRO</span>
                         <span className="capital">B</span>
