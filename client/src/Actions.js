@@ -392,7 +392,9 @@ export const initBreadcrumb = (id,symbol) => {
 
 
 const ACTION_TYPES = [
-  {name:'POST_PRODUCT_DATA',thunk:true}
+  {name:'POST_PRODUCT_DATA',thunk:true},
+  {name:'FETCH_PRODUCTS',thunk:true},
+  {name:'FETCH_PRODUCT_DETAILS',thunk:true}
 ];
 
 const TYPES = {};
@@ -420,7 +422,6 @@ ACTION_TYPES.map(T => {
 export const postProductData = (data) => {
   return dispatch => {
     dispatch(ACTIONS.postProductDataBegin());
-    console.log(data)
     return fetch(`${host}/api/products`,{
       method:'POST',
       headers:{
@@ -434,6 +435,27 @@ export const postProductData = (data) => {
     })
     .catch(error => dispatch(ACTIONS.postProductDataFailure()))
     //fetch()
+  }
+}
+
+export const fetchProducts = (id) => {
+  return dispatch => {
+    dispatch(ACTIONS.fetchProductsBegin());
+    return fetch(`${host}/api/subcategories/${id}`)
+          .then(res => res.json())
+          .then(json => dispatch(ACTIONS.fetchProductsSuccess(json)))
+          .catch(err => dispatch(ACTIONS.fetchProductsFailure(err)))          
+  }
+}
+
+export const fetchProductDetails = (id) => {
+  
+  return dispatch => {
+    dispatch(ACTIONS.fetchProductDetailsBegin());
+    return fetch(`${host}/api/products/${id}`)
+          .then(res => res.json())
+          .then(json => {console.log(json);dispatch(ACTIONS.fetchProductDetailsSuccess(json));})
+          .catch(err => dispatch(ACTIONS.fetchProductDetailsFailure(err)))          
   }
 }
 

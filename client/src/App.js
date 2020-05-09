@@ -78,7 +78,9 @@ const initialState = {
   pageReload:[],
   selectProductImages:false,
   selectedProductImageIds:[],
-  productPreviewImages:[]
+  productPreviewImages:[],
+  products:[],
+  productDetails:undefined
   
 }
 
@@ -296,6 +298,20 @@ function reducer(state=initialState,action){
     case REDUX_TYPES.POST_PRODUCT_DATA_SUCCESS:
       return {
         ...state
+      }
+    case REDUX_TYPES.FETCH_PRODUCTS_SUCCESS:
+      //console.log(action.payload)
+      return {
+        ...state,
+        products:[...action.payload],
+        notifications:[...state.notifications]
+      }
+    case REDUX_TYPES.FETCH_PRODUCT_DETAILS_SUCCESS:
+      console.log(action.payload)
+      return {
+        ...state,
+        productDetails:action.payload,
+        notifications:[...state.notifications]
       }
     default:
       return state;

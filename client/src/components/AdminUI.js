@@ -314,6 +314,14 @@ const AdminUI = (props) => {
             ...productFormData,
             galleryImages:[...selectedProductImageIds]
         }))
+        setProductFormData({name:"",
+                            code:"",
+                            hasPrice:false,
+                            price:0,
+                            categoryId:"",
+                            description:"",
+                            unit:""
+                        });
     }
 
     useEffect(() => {

@@ -128,6 +128,36 @@ app.get('/api/breadcrumb/:id/:symbol',async (req,res) => {
         })
     }
 
+    if(symbol === 'p'){
+        Promise.all([await sequelize.query(`SELECT p.id  AS zid,p.name  AS zname,
+                                                    sc.id AS yid,sc.name AS yname,
+                                                    c.id  AS xid,c.name  AS xname
+                                            FROM (SELECT * FROM products WHERE ID = ${id}) AS p,
+                                                categories AS sc,
+                                                categories as c 
+                                            WHERE sc.id = p.categoryId AND sc.parent = c.id;`)])
+        .then(qresult => {
+            const result = qresult[0][0][0];
+            const xUrlName = result.xname.trim().replace(' ','-').toLowerCase();
+            const yUrlName = result.yname.trim().replace(' ','-').toLowerCase();
+            const zUrlName = result.zname.trim().replace(' ','-').toLowerCase();
+            return res.json({path:[{name:result.xname,url:`/${xUrlName}/${result.xid}/c`},
+                                   {name:result.yname,url:`/${yUrlName}/${result.yid}/sc`},
+                                   {name:result.zname,url:`/${zUrlName}/${result.zid}/p`}]
+                            });
+        })
+    }
+
+
+    /*
+    SELECT p.id  AS zid,p.name  AS zname,
+           sc.id AS yid,sc.name AS yname,
+           c.id  AS xid,c.name  AS xname
+    FROM (SELECT * FROM products WHERE ID = 3) AS p,
+          categories AS sc,
+          categories as c 
+    WHERE sc.id = p.categoryId AND sc.parent = c.id
+    */
 
 })
 
@@ -249,9 +279,20 @@ app.get('/api/subcategories',async (req,res)=>{
 })
 
 app.get('/api/subcategories/:id',async (req,res)=>{
-    return res.json(await Product.findAll({
-                where: {categoryId:req.params.id}
-            }));
+    const products = await Product.findAll({attributes:['id','name','code','hasPrice','price','categoryId','unit','description'],
+                                            where:{categoryId:req.params.id}})
+                                  
+    await Promise.all(products.map(p => GalleryItem.findAll({attributes:['productId','imageId','orderIndex'],
+                                                             order:['orderIndex'],
+                                                             where: {productId:p.id}})))
+                 .then(galleries => {
+                        const result = products.map((p,i) => ({product:p,gallery:galleries[i]}))
+                        res.json(result);
+                    })
+                 .catch(error => res.json({err:error}));
+           
+    //const result = 
+    //return res.json(result);
 })
 
 app.get('/api/categories/:id',async (req,res)=>{
@@ -260,6 +301,17 @@ app.get('/api/categories/:id',async (req,res)=>{
             }));
 })
 
+
+app.get('/api/products/:id',async (req,res)=>{
+    await Product.findAll({where:{id:req.params.id}})
+    .then(async products => {
+        await GalleryItem.findAll({ order:['orderIndex'],
+                                    where:{productId:products[0].id}})
+                         .then(galleries => res.json({product:products[0],gallery:galleries}))
+                         .catch(error => res.json(error))
+    })
+    .catch(error => res.json(error))
+})
 /*
   name: 'Hello',
   code: 'bdsjbkgjs',
@@ -271,9 +323,9 @@ app.get('/api/categories/:id',async (req,res)=>{
 */
 
 app.post('/api/products/',async (req,res)=>{
-    //console.log(req.body);
+
     const {name,code,hasPrice,price,unit,categoryId,description,galleryImages} = req.body;
-    //n,c,hP,p,u,cI,d
+
     await Product.create({name:name,
                           code:code,
                           hasPrice:hasPrice,
@@ -281,8 +333,7 @@ app.post('/api/products/',async (req,res)=>{
                           unit:hasPrice ? unit : null,
                           categoryId:categoryId,
                           description:description})
-    .then(newProduct => {  
-
+    .then(newProduct => {
         return Promise.all(galleryImages.map((gI,index) => GalleryItem.create({productId:newProduct.dataValues.id,imageId:gI,orderIndex:index})))
                       .then(()=>res.send(200))
                       .catch(()=>res.send(500));

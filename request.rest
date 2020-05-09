@@ -43,3 +43,7 @@ GET http://localhost:5000/api/subcategories/
 ###
 
 GET http://localhost:5000/api/subcategories/13
+
+###
+
+GET http://localhost:5000/api/products/5
