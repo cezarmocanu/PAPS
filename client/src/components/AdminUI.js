@@ -22,7 +22,8 @@ import {reloadToken,
         selectProductImageDeselect,
         selectProductImageEnd,
         fetchAllSubcategories,
-        postProductData} from '../Actions';
+        postProductData,
+        REDUX_ACTIONS} from '../Actions';
 import Carousel from './Carousel';
 import Select from './Select';
 
@@ -40,10 +41,12 @@ const AdminUI = (props) => {
            selectProductImages,
            selectedProductImageIds,
            productPreviewImages,
-           allSubcategories
+           allSubcategories,
+           adminMenuOpen,
+           updateProduct,
+           productToUpdate
            } = props;
     const [showUpload,setShowUpload] = useState(false);
-    const [open, setOpen] = useState(false);
     
 
     const onDrop = useCallback(acceptedFiles => {
@@ -106,8 +109,6 @@ const AdminUI = (props) => {
         })
         props.dispatch(postUploadQueue(formData))
         props.dispatch(clearUploadQueue());
-        
-        //
     }
 
     const previewImages = uploadQueueData.map(
@@ -206,7 +207,36 @@ const AdminUI = (props) => {
                                                             categoryId:"",
                                                             description:"",
                                                             unit:""})
+
     const [canSubmitProductForm, setCanSubmitProductForm] = useState(false)                                                           
+
+    useEffect(() => {
+        if(productToUpdate!==undefined){
+            const {product,gallery} = productToUpdate;
+            setProductFormData({
+                name:product.name,
+                code:product.code,
+                hasPrice:product.hasPrice,
+                price:product.price,
+                categoryId:product.categoryId,
+                description:product.description,
+                unit:product.unit
+            });
+
+            gallery.map(g => props.dispatch(selectProductImageChoose(g.imageId)))
+           // props.dispatch(selectProductImageEnd())
+            //selectProductImageChoose(gallery.map(g => g.imageId))
+            //productPreviewImages = gallery.map(g => galleryImages[g.imageId]);
+            
+        }
+    }, [updateProduct])
+
+    useEffect(() => {
+        if(updateProduct){
+            props.dispatch(selectProductImageEnd())
+        }
+            
+    }, [selectedProductImageIds])
 
     const submitCategoryForm = (e)=>{
         e.preventDefault();
@@ -290,6 +320,7 @@ const AdminUI = (props) => {
                                     </div>)}]
 
     const selectProductSubcategory = <Select
+                            initialValue={productToUpdate !== undefined && updateProduct?productToUpdate.product.categoryId:-1}
                             onChange={o => setProductFormData({...productFormData,categoryId:o.value})}
                             options={allSubcategories}
                             />;
@@ -310,10 +341,38 @@ const AdminUI = (props) => {
 
     const submitProductForm = (e)=>{
         e.preventDefault();
-        props.dispatch(postProductData({
-            ...productFormData,
-            galleryImages:[...selectedProductImageIds]
-        }))
+        if(updateProduct){
+            const fields = [];
+            //const imagesModified = productToUpdate.gallery.length !== selectedProductImageIds || productToUpdate.gallery.map(gI => selectedProductImageIds.indexOf(gI.imageId) !== -1).includes(true);
+            
+            const imagesModified = true;
+            fields.push(...[
+                {name:"name"       ,value:productFormData.name       ,condition:productFormData.name!==productToUpdate.product.name},
+                {name:"code"       ,value:productFormData.code       ,condition:productFormData.code!==productToUpdate.product.code},
+                {name:"category"   ,value:productFormData.categoryId ,condition:productFormData.categoryId!==productToUpdate.product.categoryId},
+                {name:"description",value:productFormData.description,condition:productFormData.description!==productToUpdate.product.description},
+                {name:"price"      ,value:productFormData.price      ,condition:productFormData.hasPrice===true && productFormData.price !== productToUpdate.product.price},
+                {name:"unit"       ,value:productFormData.unit       ,condition:productFormData.hasPrice===true && productFormData.unit !== productToUpdate.product.unit},
+                {name:"hasPrice"   ,value:productFormData.hasPrice   ,condition:productFormData.hasPrice!==productToUpdate.product.hasPrice},
+                {name:"gallery"    ,value:selectedProductImageIds    ,condition:imagesModified}
+            ]);
+            
+            const updateData =fields.filter(field => field.condition)
+                                    .reduce((updateData,field)=>{
+                                        updateData[field.name] = field.value;
+                                        return updateData;
+                                    },{})
+            //updateData["galleryImages"] = [...selectedProductImageIds];
+            console.log(updateData);
+
+        }
+        else{
+            props.dispatch(postProductData({
+                ...productFormData,
+                galleryImages:[...selectedProductImageIds]
+            }))
+        }
+
         setProductFormData({name:"",
                             code:"",
                             hasPrice:false,
@@ -322,21 +381,35 @@ const AdminUI = (props) => {
                             description:"",
                             unit:""
                         });
+        
     }
 
     useEffect(() => {
-        const hasError = [
-            productFormData.name==="",
-            productFormData.code==="",
-            productFormData.categoryId==="",
-            productFormData.categoryId==="novalue",
-            productFormData.description==="",
-            productFormData.hasPrice===true && productFormData.price <= 0,
-            productFormData.hasPrice===true && isNaN(parseFloat(productFormData.price)),
-            productFormData.hasPrice===true && productFormData.unit==="",
-            selectedProductImageIds.length <= 0
-        ];
-        setCanSubmitProductForm(!hasError.includes(true))
+        const hasError = [];
+        const hasModification = [];
+        hasError.push(...[productFormData.name==="",
+                            productFormData.code==="",
+                            productFormData.categoryId==="",
+                            productFormData.categoryId==="novalue",
+                            productFormData.description==="",
+                            productFormData.hasPrice===true && productFormData.price <= 0,
+                            productFormData.hasPrice===true && isNaN(parseFloat(productFormData.price)),
+                            productFormData.hasPrice===true && productFormData.unit==="",
+                            selectedProductImageIds.length <= 0])
+        
+        if(productToUpdate)
+            hasModification.push(...[productFormData.name!==productToUpdate.product.name,
+                                        productFormData.code!==productToUpdate.product.code,
+                                        productFormData.categoryId!==productToUpdate.product.categoryId,
+                                        productFormData.description!==productToUpdate.product.description,
+                                        productFormData.hasPrice!==productToUpdate.product.hasPrice,
+                                        productFormData.hasPrice===true && productFormData.price !== productToUpdate.product.price,
+                                        productFormData.hasPrice===true && productFormData.unit !== productToUpdate.product.unit
+                                    ])
+        if(updateProduct)                    
+            setCanSubmitProductForm(hasModification.includes(true) && !hasError.includes(true));
+        else
+            setCanSubmitProductForm(!hasError.includes(true));
     }, [productFormData])
 
     const productSuboptions = [{name:'Adauga Produse Noi',
@@ -387,7 +460,7 @@ const AdminUI = (props) => {
                                                 onChange={onChangeProductForm}
                                                 name="price" 
                                                 type="text"
-                                                value={productFormData.price}
+                                                value={productFormData.price ? productFormData.price : ''}
                                                 required/>
                                                 <span className="label" 
                                                 >Pret</span>   
@@ -400,7 +473,7 @@ const AdminUI = (props) => {
                                                 onChange={onChangeProductForm}
                                                 name="unit" 
                                                 type="text"
-                                                value={productFormData.unit}
+                                                value={productFormData.unit ? productFormData.unit : ''}
                                                 required/>
                                                 <span className="label" 
                                                 >Unitate De Masura</span>   
@@ -430,10 +503,19 @@ const AdminUI = (props) => {
                                             </div>
                                             {canSubmitProductForm &&
                                             <div className="form-input">
+                                                {!updateProduct && 
                                                 <input 
                                                 className="button-input" 
                                                 type="submit" 
                                                 value="Salveaza Produsul"/>
+                                                }
+                                                {updateProduct && 
+                                                <input 
+                                                className="button-input" 
+                                                type="submit" 
+                                                value="Modifica Produsul"/>
+                                                }
+                                                
                                             </div>
                                             }
                                             
@@ -531,14 +613,14 @@ const AdminUI = (props) => {
                       ref:useRef(null)},
                      ]
 
-    //de facut in reducer
-    const togglePanel = () =>{
-        setOpen(!open);
-    }
 
     const optionsList = options.map((o,index) => {
                                         const isCurrentOption = currentAdminMenu === index;
-                                        OutsideClick(o.ref,isCurrentOption,()=>{console.log("outside");props.dispatch(changeAdminMenu(undefined))});
+                                        OutsideClick(o.ref,isCurrentOption,()=>{
+                                            props.dispatch(changeAdminMenu(undefined))
+                                            props.dispatch(REDUX_ACTIONS.toggleAdminMenu())
+                                            props.dispatch(REDUX_ACTIONS.editProductClear())
+                                        });
                                         return(<div ref={o.ref} key={o.name} className={`admin-option ${isCurrentOption?"open":"close"}`} >
                                                 <div className="icon" onClick={()=>props.dispatch(changeAdminMenu(index))}>{o.icon}</div>
                                                 {isCurrentOption && <div className={`connection ${isCurrentOption?"open":"close"}`}></div>}
@@ -553,8 +635,8 @@ const AdminUI = (props) => {
 
     return (role ==='admin' && 
             <div className="admin-ui">
-                <div className="admin-panel-button" onClick={togglePanel}>Administrare</div>
-                <div className={`admin-panel ${open?'open':'closed'}`}>
+                <div className="admin-panel-button" onClick={()=>props.dispatch(REDUX_ACTIONS.toggleAdminMenu())}>Administrare</div>
+                <div className={`admin-panel ${adminMenuOpen?'open':'closed'}`}>
                     {optionsList}
                 </div>
                 
@@ -576,7 +658,10 @@ const mapStateToProps = (state) => ({
     selectProductImages:state.selectProductImages,
     selectedProductImageIds:state.selectedProductImageIds,
     productPreviewImages:state.productPreviewImages,
-    allSubcategories:state.allSubcategories
+    allSubcategories:state.allSubcategories,
+    productToUpdate:state.productToUpdate,
+    updateProduct:state.updateProduct,
+    adminMenuOpen:state.adminMenuOpen
     
 })
 

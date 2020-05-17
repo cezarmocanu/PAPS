@@ -159,8 +159,8 @@ export const selectProductImageEnd = () =>({type:SELECT_PRODUCT_IMAGE_END})
 
 
 //const host = "http://localhost:5000";
-const host = "http://192.168.1.111:5000";
-//const host = "https://agrobrazdare.ro";
+//const host = "http://192.168.1.111:5000";
+const host = "https://agrobrazdare.ro";
 
 export const B64toJSON = (s) => {
   try {
@@ -394,7 +394,11 @@ export const initBreadcrumb = (id,symbol) => {
 const ACTION_TYPES = [
   {name:'POST_PRODUCT_DATA',thunk:true},
   {name:'FETCH_PRODUCTS',thunk:true},
-  {name:'FETCH_PRODUCT_DETAILS',thunk:true}
+  {name:'FETCH_PRODUCT_DETAILS',thunk:true},
+  'TOGGLE_ADMIN_MENU',
+  'EDIT_PRODUCT_START',
+  'EDIT_PRODUCT_CLEAR',
+  {name:'UPDATE_PRODUCT',thunk:true}
 ];
 
 const TYPES = {};

@@ -1,0 +1,17 @@
+product
+    id
+    name
+    code
+    hasPrice
+    price
+    description
+    category
+
+
+const clickEvent2 = (selected,arr) => {
+  let lastIndex = 1;
+	arr.map(nr => {
+		console.log(`${nr}${selected.includes(nr)?` ${lastIndex++}X`:''}`)
+})
+}
+

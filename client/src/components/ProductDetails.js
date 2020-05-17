@@ -26,7 +26,9 @@ const ProductDetails = (props)=>{
                   {images}                  
                   <h1>{productDetails.product.name}</h1>
                   <h3>{productDetails.product.code}</h3>
-                  {productDetails.product.hasPrice &&<h4>Pret:{productDetails.product.price}/{productDetails.product.unit}</h4>}
+                  
+                  {productDetails.product.hasPrice  && <h4>Pret:{productDetails.product.price}/{productDetails.product.unit}</h4>}
+                  
                 </div>}
           </div>
 };

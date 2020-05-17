@@ -57,6 +57,7 @@ import { //ADD_PAGE,
 import Footer from './components/Footer';
 
 const initialState = {
+  adminMenuOpen:false,
   lateralPanelToggled:false,
   breadcrumbPath:[{name:'Acasa',url:'/'}],
   breadcrumbsInitialized:false,
@@ -80,7 +81,9 @@ const initialState = {
   selectedProductImageIds:[],
   productPreviewImages:[],
   products:[],
-  productDetails:undefined
+  productDetails:undefined,
+  productToUpdate:undefined,
+  updateProduct:false,
   
 }
 
@@ -133,7 +136,6 @@ function reducer(state=initialState,action){
         signupSuccess:false
       }
     case CHECK_ADMINS_SUCCESS:
-      console.log(action.payload)
       return{
         ...state,
         hasAdmins:action.payload
@@ -235,9 +237,7 @@ function reducer(state=initialState,action){
         notifications:["subcategories",...state.notifications]
       }
     case FETCH_CLIENT_IMAGE_SUCCESS:
-      
       state.imagesHashMap[action.payload.id] = action.payload.data;
-
       return {
         ...state,
         imagesHashMap:{...state.imagesHashMap}
@@ -307,11 +307,32 @@ function reducer(state=initialState,action){
         notifications:[...state.notifications]
       }
     case REDUX_TYPES.FETCH_PRODUCT_DETAILS_SUCCESS:
-      console.log(action.payload)
       return {
         ...state,
         productDetails:action.payload,
         notifications:[...state.notifications]
+      }
+    case REDUX_TYPES.TOGGLE_ADMIN_MENU:
+      return{
+        ...state,
+        adminMenuOpen:!state.adminMenuOpen
+      }
+    case REDUX_TYPES.EDIT_PRODUCT_START:
+      return{
+          ...state,
+          updateProduct:true,
+          productToUpdate:action.payload,
+          currentAdminMenu:2,
+          currentAdminSubmenu:0,
+          adminMenuOpen:true,
+      }
+    case REDUX_TYPES.EDIT_PRODUCT_CLEAR:
+      return{
+        ...state,
+        updateProduct:false,
+        productToUpdate:undefined,
+        selectedProductImageIds:[],
+        productPreviewImages:[]
       }
     default:
       return state;

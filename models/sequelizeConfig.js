@@ -1,16 +1,16 @@
 const Sequelize = require('sequelize');
 const logger = require('../logs/Logger');
-/*
+
 const sequelize = new Sequelize('agrobraz_db', 'agrobraz_test', 'pass@agrobraz', {
   host: 'localhost',
   dialect: 'mysql'
 });
-*/
+/*
 const sequelize = new Sequelize('test_paps', 'paps', 'parola@paps', {
   host: 'localhost',
   dialect: 'mysql'
 });
-
+*/
 sequelize
   .authenticate()
   .then(() => {

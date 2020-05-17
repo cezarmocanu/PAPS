@@ -19,7 +19,8 @@ const Carousel = (props) => {
     useEffect(() => {
         let interval = null;
         interval = setInterval(() => {
-            setCurrentIndex((currentIndex+1)%slides.length)
+            const next = (currentIndex+1)%slides.length;
+            setCurrentIndex(isNaN(next)?0:next);
         }, 5000);
         return ()=>clearInterval(interval);
 
@@ -36,7 +37,10 @@ const Carousel = (props) => {
                         </div>
                         <div className="current-slide">
                             <div className="slide-container">
-                                <img src={slides[currentIndex].data}/>
+                                {
+                                slides[currentIndex] &&
+                                <img src={slides[currentIndex].data}/>    
+                                }
                             </div>
                         </div>
                         <div 

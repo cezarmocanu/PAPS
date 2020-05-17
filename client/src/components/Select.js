@@ -4,11 +4,18 @@ const Select = (props) => {
 
     
     const wrapperRef = useRef(null);
-    const {onChange,options} = props;
+    const {onChange,options,initialValue} = props;
     const defaultOption = {name:"Selectati o valoare",value:"novalue"};
     const [selectedOption, setSelectedOption] = useState(defaultOption);
     const [open, setOpen] = useState(false);
     OutsideClick(wrapperRef,open,()=>setOpen(false));
+
+    useEffect(() => {
+        if(initialValue===-1)
+            setSelectedOption(defaultOption);
+        else
+            setSelectedOption(options[options.findIndex(o => o.value === initialValue)])
+    }, [initialValue])
 
     useEffect(() => {
         onChange(selectedOption);

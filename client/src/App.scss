@@ -678,113 +678,142 @@
       box-shadow: 0px 2px 19px 0px rgba(0,0,0,0.3);
       position: relative;
 
-      &:hover{
-          
-        .image{
-          cursor:pointer !important;
-        }
-        .details{
-          cursor:pointer !important;
-          hr{
-            left: 5%;
-            right: 5%;
-            width:90%;
-            transition: 0.5s;
-            border-top:2px solid lighten($primary,20);
-          }
 
-          .price{
-            background-color:lighten($primary, 25);
-            padding-left:10px;
-            padding-right:10px;
-            transition:0.2s;
+      .edit-button{
+        position: absolute;
+        top:10px;
+        left:10px;
+        width:20px;
+        height:20px;
+        padding:10px;
+        text-align: center;
+        background-color: $info;
+        border-radius:100%;
+        color:white;
+
+        &:hover{
+          background-color: darken($info,10);
+          cursor:pointer;
+        }
+
+        &:active{
+          background-color: darken($info,20);
+          cursor:pointer;
+        }
+      }
+
+      .product-content{
+        width:100%;
+        height:100%;
+        position:relative;
+        &:hover{
+          
+          .image{
             cursor:pointer !important;
           }
+          .details{
+            cursor:pointer !important;
+            hr{
+              left: 5%;
+              right: 5%;
+              width:90%;
+              transition: 0.5s;
+              border-top:2px solid lighten($primary,20);
+            }
+  
+            .price{
+              background-color:lighten($primary, 25);
+              padding-left:10px;
+              padding-right:10px;
+              transition:0.2s;
+              cursor:pointer !important;
+            }
+          }
+          
+          
         }
         
-        
-      }
-      
-      .image{
-        width: calc(100%);
-        height: calc(50%);
-        display: flex;
-        -webkit-user-select: none; /* Safari */        
-        -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* IE10+/Edge */
-        user-select: none; /* Standard */
-        
-        img{
-          display: block;
-          max-width: calc(100% - 20px);
-          max-height: calc(100% - 20px);
-          margin: auto;
-          padding: 10px;
-        }
-      }
-
-      
-
-      .details{
-        position: relative;
-        
-        width: calc(100% - 10px);
-        height: calc(50%);
-        padding:5px;
-        text-align: center;
-        flex-flow: column;
-        display: flex;
-
-        h1,h2,h3,h4,h5,h6{
-          padding:0px;
-          margin:0px;
-        }
-
-        
-
-        hr{
-          position: absolute;
-          top: 0px;
-          left: 25%;
-          right: 25%;
-          width:50%;
-          border-top:2px solid $primary;
-          margin: auto;
-          transition: 0.5s;
+        .image{
+          width: calc(100%);
+          height: calc(50%);
+          display: flex;
+          -webkit-user-select: none; /* Safari */        
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* IE10+/Edge */
+          user-select: none; /* Standard */
+          
+          img{
+            display: block;
+            max-width: calc(100% - 20px);
+            max-height: calc(100% - 20px);
+            margin: auto;
+            padding: 10px;
+          }
         }
         
-        .code-text{
-          margin-top:10px;
-          color:$primary;
-        }
-        .name-text{
-          margin-top:5px;
-          color:$primary;
-        }
-        .price{
-          background-color:lighten($primary, 20);
-          color:white;
-          border-radius:10px;
-          width: max-content;
-          height: max-content;
-          margin:auto;
-          margin-top:auto;
-          margin-bottom:15px;
+        .details{
+          position: relative;
+          
+          width: calc(100% - 10px);
+          height: calc(50%);
           padding:5px;
-          padding-left:25px;
-          padding-right:25px;
-          font-weight: bolder;
-          transition:0.5s;
-          flex-flow:row;
-          display:flex;
-          .price-text{
-            
+          text-align: center;
+          flex-flow: column;
+          display: flex;
+  
+          h1,h2,h3,h4,h5,h6{
+            padding:0px;
+            margin:0px;
           }
-          .unit-text{
-            
+  
+          
+  
+          hr{
+            position: absolute;
+            top: 0px;
+            left: 25%;
+            right: 25%;
+            width:50%;
+            border-top:2px solid $primary;
+            margin: auto;
+            transition: 0.5s;
+          }
+          
+          .code-text{
+            margin-top:10px;
+            color:$primary;
+          }
+          .name-text{
+            margin-top:5px;
+            color:$primary;
+          }
+          .price{
+            background-color:lighten($primary, 20);
+            color:white;
+            border-radius:10px;
+            width: max-content;
+            height: max-content;
+            margin:auto;
+            margin-top:auto;
+            margin-bottom:15px;
+            padding:5px;
+            padding-left:25px;
+            padding-right:25px;
+            font-weight: bolder;
+            transition:0.5s;
+            flex-flow:row;
+            display:flex;
+            .price-text{
+              
+            }
+            .unit-text{
+              
+            }
           }
         }
       }
+
+      
     }
   }
   .category-list{
