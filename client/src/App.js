@@ -84,7 +84,6 @@ const initialState = {
   productDetails:undefined,
   productToUpdate:undefined,
   updateProduct:false,
-  
 }
 
 function reducer(state=initialState,action){

@@ -55,7 +55,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({origin:"*"}));
 
 //de facut check la token in momentul in care sunt facute requesturi la anumite rute
-app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.post('/admin/uploadimages', uploads.array('photos', 25),async (req, res, next) => {
     try {
@@ -103,7 +102,6 @@ app.post('/admin/uploadimages', uploads.array('photos', 25),async (req, res, nex
 app.get('/api/breadcrumb/:id/:symbol',async (req,res) => {
     const id = req.params.id;
     const symbol = req.params.symbol;
-    console.log(id,symbol)
 
     if(symbol === 'c'){
         Promise.all([await Category.findAll({attributes:['id','name'],where:{id:id}})])

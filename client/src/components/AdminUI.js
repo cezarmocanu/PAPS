@@ -74,6 +74,7 @@ const AdminUI = (props) => {
         setShowUpload(uploadQueueData.length > 0);
     }, [uploadQueueData])
 
+    
     useEffect(() => {
         if(galleryShouldReload)
             props.dispatch(fetchAllImages(galleryImages));   
@@ -618,7 +619,7 @@ const AdminUI = (props) => {
                                         const isCurrentOption = currentAdminMenu === index;
                                         OutsideClick(o.ref,isCurrentOption,()=>{
                                             props.dispatch(changeAdminMenu(undefined))
-                                            props.dispatch(REDUX_ACTIONS.toggleAdminMenu())
+                                            
                                             props.dispatch(REDUX_ACTIONS.editProductClear())
                                         });
                                         return(<div ref={o.ref} key={o.name} className={`admin-option ${isCurrentOption?"open":"close"}`} >

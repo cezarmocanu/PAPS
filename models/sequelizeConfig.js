@@ -5,8 +5,9 @@ const sequelize = new Sequelize('agrobraz_db', 'agrobraz_test', 'pass@agrobraz',
   host: 'localhost',
   dialect: 'mysql'
 });
+
 /*
-const sequelize = new Sequelize('test_paps', 'paps', 'parola@paps', {
+const sequelize = new Sequelize('test_paps', 'agrobraz_test', 'pass@agrobraz', {
   host: 'localhost',
   dialect: 'mysql'
 });
